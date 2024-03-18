@@ -16,19 +16,18 @@ a_0_row=[-.0065,.003,-.0045,.004];
 h_G_row=nan(1,7*N_layer);
 T_row=nan(1,7*N_layer);
 p_row=nan(1,7*N_layer);
-for n=1:2:7 % Gradient layers
+for n=1:7
     ind_layer_vec=N_layer*(n-1)+(1:N_layer);
     h_G_row(ind_layer_vec)=linspace(h_G0_row(n),h_G0_row(n+1),N_layer);
-    ind_a_0=(n+1)/2;
-    T_row(ind_layer_vec)=T_0_row(n)+a_0_row(ind_a_0).*(h_G_row(ind_layer_vec)-h_G0_row(n));
-    p_row(ind_layer_vec)=p_0_row(n).*(T_row(ind_layer_vec)./T_0_row(n)).^(-g_0./a_0_row(ind_a_0)./R);
-end
 
-for n=2:2:7 % Isothermal layers
-    ind_layer_vec=N_layer*(n-1)+(1:N_layer);
-    h_G_row(ind_layer_vec)=linspace(h_G0_row(n),h_G0_row(n+1),N_layer);
-    T_row(ind_layer_vec)=repelem(T_0_row(n),1,N_layer);
-    p_row(ind_layer_vec)=p_0_row(n).*exp(-g_0.*(h_G_row(ind_layer_vec)-h_G0_row(n))./R./T_0_row(n));
+    if mod(n,2)~=0
+        ind_a_0=(n+1)/2;
+        T_row(ind_layer_vec)=T_0_row(n)+a_0_row(ind_a_0).*(h_G_row(ind_layer_vec)-h_G0_row(n));
+        p_row(ind_layer_vec)=p_0_row(n).*(T_row(ind_layer_vec)./T_0_row(n)).^(-g_0./a_0_row(ind_a_0)./R);
+    else
+        T_row(ind_layer_vec)=repelem(T_0_row(n),1,N_layer);
+        p_row(ind_layer_vec)=p_0_row(n).*exp(-g_0.*(h_G_row(ind_layer_vec)-h_G0_row(n))./R./T_0_row(n));
+    end
 end
 h_row=r.*h_G_row./(r+h_G_row);
 rho_row=p_row./R./T_row;
