@@ -14,22 +14,20 @@ T_vec=nan(size(h_G_vec));
 p_vec=T_vec;
 
 for n=1:numel(h_G_vec)
-    if h_G_vec(n)>=h_G0_row(1) && h_G_vec(n)<=h_G0_row(2)
-        [T_vec(n),p_vec(n)]=graient_T_p(h_G_vec(n),h_G0_row(1),T_0_row(1),p_0_row(1),a_0_row(1));
-    elseif h_G_vec(n)<=h_G0_row(3)
-        [T_vec(n),p_vec(n)]=isothermal_T_p(h_G_vec(n),h_G0_row(2),T_0_row(2),p_0_row(2));
-    elseif h_G_vec(n)<=h_G0_row(4)
-        [T_vec(n),p_vec(n)]=graient_T_p(h_G_vec(n),h_G0_row(3),T_0_row(3),p_0_row(3),a_0_row(2));
-    elseif h_G_vec(n)<=h_G0_row(5)
-        [T_vec(n),p_vec(n)]=isothermal_T_p(h_G_vec(n),h_G0_row(4),T_0_row(4),p_0_row(4));
-    elseif h_G_vec(n)<=h_G0_row(6)
-        [T_vec(n),p_vec(n)]=graient_T_p(h_G_vec(n),h_G0_row(5),T_0_row(5),p_0_row(5),a_0_row(3));
-    elseif h_G_vec(n)<=h_G0_row(7)
-        [T_vec(n),p_vec(n)]=isothermal_T_p(h_G_vec(n),h_G0_row(6),T_0_row(6),p_0_row(6));
-    elseif h_G_vec(n)<=h_G0_row(8)
-        [T_vec(n),p_vec(n)]=graient_T_p(h_G_vec(n),h_G0_row(7),T_0_row(7),p_0_row(7),a_0_row(4));
-    else
-        error("Invalid value in the input. Values must lie in the region ["+h_G0_row(1)+","+h_G0_row(end)+"]");
+    if h_G_vec(n)<h_G0_row(1) || h_G_vec(n)>h_G0_row(end)
+        warning("Invalid value in the input. Values must lie in the region ["+h_G0_row(1)+","+h_G0_row(end)+"]");
+    end
+    
+    for m=2:8
+        if h_G_vec(n)<=h_G0_row(m)
+            if mod(m,2)==0  %m is even ==> gradient layer
+                [T_vec(n),p_vec(n)]=graient_T_p(h_G_vec(n),h_G0_row(m-1),T_0_row(m-1),p_0_row(m-1),a_0_row(m/2));
+            else    %m is odd ==> isothermal layer
+                [T_vec(n),p_vec(n)]=isothermal_T_p(h_G_vec(n),h_G0_row(m-1),T_0_row(m-1),p_0_row(m-1));
+            end
+
+            break
+        end
     end
 end
 rho_vec=p_vec./R./T_vec;
