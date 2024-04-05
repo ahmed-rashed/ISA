@@ -5,9 +5,22 @@ r=6.356766e6;
 gamma=1.4;
 
 h_G0_row=[0,11,25,47,53,79,90,105]*1e3;
-T_0_row=[288.16,216.66,216.66,282.66,282.66,165.66,165.66];
-p_0_row=[101330,22632,2488.6,120.44,58.321,1.0094,.10444];
+N_layers=length(h_G0_row)-1;
 a_0_row=[-.0065,.003,-.0045,.004];
+T_0_row=nan(1,N_layers);
+T_0_row(1)=288.16;
+p_0_row=nan(1,N_layers);
+p_0_row(1)=101330;
+
+% Fill in T_0_row and p_0_row
+for n=1:N_layers-1
+    if mod(n,2)~=0  %n is odd ==> gradient layer
+        [T_0_row(n+1),p_0_row(n+1)]=graient_T_p(h_G0_row(n+1),h_G0_row(n),T_0_row(n),p_0_row(n),a_0_row((n+1)/2));
+    else    %n is even ==> isothermal layer
+        [T_0_row(n+1),p_0_row(n+1)]=isothermal_T_p(h_G0_row(n+1),h_G0_row(n),T_0_row(n),p_0_row(n));
+    end
+end
+% [T_0_row.',p_0_row.']
 
 h_vec=r.*h_G_vec./(r+h_G_vec);
 T_vec=nan(size(h_G_vec));
