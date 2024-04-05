@@ -14,11 +14,7 @@ p_0_row(1)=101330;
 
 % Fill in T_0_row and p_0_row
 for n_layer=1:N_layers-1
-    if mod(n_layer,2)~=0  %n_layer is odd ==> gradient layer
-        [T_0_row(n_layer+1),p_0_row(n_layer+1)]=graient_T_p(h_G0_row(n_layer+1),n_layer);
-    else    %n_layer is even ==> isothermal layer
-        [T_0_row(n_layer+1),p_0_row(n_layer+1)]=isothermal_T_p(h_G0_row(n_layer+1),n_layer);
-    end
+    [T_0_row(n_layer+1),p_0_row(n_layer+1)]=graient_isothermal_T_p(h_G0_row(n_layer+1),n_layer);
 end
 [T_0_row.',p_0_row.'] %#ok<NOPRT> 
 
@@ -33,12 +29,7 @@ for n=1:numel(h_G_vec)
     
     for n_layer=1:N_layers
         if h_G_vec(n)<=h_G0_row(n_layer+1)
-            if mod(n_layer,2)~=0  %n_layer is odd ==> gradient layer
-                [T_vec(n),p_vec(n)]=graient_T_p(h_G_vec(n),n_layer);
-            else    %n_layer is even ==> isothermal layer
-                [T_vec(n),p_vec(n)]=isothermal_T_p(h_G_vec(n),n_layer);
-            end
-
+            [T_vec(n),p_vec(n)]=graient_isothermal_T_p(h_G_vec(n),n_layer);
             break
         end
     end
@@ -46,13 +37,13 @@ end
 rho_vec=p_vec./R./T_vec;
 a_vec=sqrt(gamma.*R.*T_vec);
 
-    function [T,p]=graient_T_p(h_G,n_layer)
+function [T,p]=graient_isothermal_T_p(h_G,n_layer)
+    if mod(n_layer,2)~=0  %n_layer is odd ==> gradient layer
         T=T_0_row(n_layer)+a_0_row((n_layer+1)/2).*(h_G-h_G0_row(n_layer));
         p=p_0_row(n_layer).*(T./T_0_row(n_layer)).^(-g_0./a_0_row((n_layer+1)/2)./R);
-    end
-    
-    function [T,p]=isothermal_T_p(h_G,n_layer)
+    else    %n_layer is even ==> isothermal layer
         T=T_0_row(n_layer);
         p=p_0_row(n_layer).*exp(-g_0.*(h_G-h_G0_row(n_layer))./R./T_0_row(n_layer));
     end
+end
 end
