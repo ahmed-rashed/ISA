@@ -9,30 +9,30 @@ tic; %To measure the execution time
 toc %To measure the execution time
 
 figure;
-plot(h_vec,h_G_vec)
+plot(h_vec./1e3,h_G_vec./1e3)
 xlabel('$h$ (km)','interpreter','latex')
 ylabel('$h_{G}$ (km)','interpreter','latex')
 
 figure;
 tiledlayout(1,2)
 nexttile
-plot(T_vec,h_G_vec)
+plot(T_vec-273,h_G_vec./1e3)
 xlabel('$T$ (\r{ }C)','interpreter','latex')
 ylabel('$h_{G}$ (km)','interpreter','latex')
 
 nexttile
-plot(a_vec,h_G_vec)
+plot(a_vec./1e3/(1/60/60),h_G_vec./1e3)
 xlabel('$a$ (km/h)','interpreter','latex')
 ylabel('$h_{G}$ (km)','interpreter','latex')
 
 figure;
 tiledlayout(1,2)
 nexttile
-plot(p_vec,h_G_vec)
+plot(p_vec./1e5,h_G_vec./1e3)
 xlabel('$p$ (bar)','interpreter','latex')
 ylabel('$h_{G}$ (km)','interpreter','latex')
 
 nexttile
-plot(rho_vec,h_G_vec)
+plot(rho_vec,h_G_vec./1e3)
 xlabel('$\rho$ (kg/m\textsuperscript{3})','interpreter','latex')
 ylabel('$h_{G}$ (km)','interpreter','latex')

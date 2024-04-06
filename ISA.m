@@ -2,32 +2,21 @@ clc
 clearvars
 close all
 
-g_0=9.80665;
-R=287.04;
 r=6.356766e6;
 gamma=1.4;
+R=287.04;
+h_G0_row=[0,11,25,47,53,79,90,105]*1e3;
+N_layers=length(h_G0_row)-1;
 
 N_layer=50;
-h_G0_row=[0,11,25,47,53,79,90,105]*1e3;
-T_0_row=[288.16,216.66,216.66,282.66,282.66,165.66,165.66];
-p_0_row=[101330,22632,2488.6,120.44,58.321,1.0094,.10444];
-a_0_row=[-.0065,.003,-.0045,.004];
 
-h_G_row=nan(1,7*N_layer);
-T_row=nan(1,7*N_layer);
-p_row=nan(1,7*N_layer);
-for n=1:7
-    ind_layer_vec=N_layer*(n-1)+(1:N_layer);
-    h_G_row(ind_layer_vec)=linspace(h_G0_row(n),h_G0_row(n+1),N_layer);
-
-    if mod(n,2)~=0
-        ind_a_0=(n+1)/2;
-        T_row(ind_layer_vec)=T_0_row(n)+a_0_row(ind_a_0).*(h_G_row(ind_layer_vec)-h_G0_row(n));
-        p_row(ind_layer_vec)=p_0_row(n).*(T_row(ind_layer_vec)./T_0_row(n)).^(-g_0./a_0_row(ind_a_0)./R);
-    else
-        T_row(ind_layer_vec)=repelem(T_0_row(n),1,N_layer);
-        p_row(ind_layer_vec)=p_0_row(n).*exp(-g_0.*(h_G_row(ind_layer_vec)-h_G0_row(n))./R./T_0_row(n));
-    end
+h_G_row=nan(1,N_layers*N_layer);
+T_row=nan(1,N_layers*N_layer);
+p_row=nan(1,N_layers*N_layer);
+for n_layer=1:N_layers
+    ind_layer_vec=N_layer*(n_layer-1)+(1:N_layer);
+    h_G_row(ind_layer_vec)=linspace(h_G0_row(n_layer),h_G0_row(n_layer+1),N_layer);
+    [T_row(ind_layer_vec),p_row(ind_layer_vec)]=graient_isothermal_T_p(h_G0_row,R,h_G_row(ind_layer_vec),n_layer);
 end
 h_row=r.*h_G_row./(r+h_G_row);
 rho_row=p_row./R./T_row;
@@ -54,7 +43,7 @@ figure
 tiledlayout(1,2)
 
 nexttile
-plot(p_row/1e5,h_G_row./1e3)
+plot(p_row./1e5,h_G_row./1e3)
 xlabel('p (bar)')
 ylabel('h_G (km)')
 
@@ -62,3 +51,19 @@ nexttile
 plot(rho_row,h_G_row./1e3)
 xlabel('rho (kg/m^3)')
 ylabel('h_G (km)')
+
+function [T,p]=graient_isothermal_T_p(h_G0_row,R,h_G_vec,n_layer)
+    g_0=9.80665;
+    
+    T_0_row=[288.16,216.66,216.66,282.66,282.66,165.66,165.66];
+    p_0_row=[101330,22632,2488.6,120.44,58.321,1.0094,.10444];
+    a_0_row=[-.0065,.003,-.0045,.004];
+
+    if mod(n_layer,2)~=0  %n_layer is odd ==> gradient layer
+        T=T_0_row(n_layer)+a_0_row((n_layer+1)/2).*(h_G_vec-h_G0_row(n_layer));
+        p=p_0_row(n_layer).*(T./T_0_row(n_layer)).^(-g_0./a_0_row((n_layer+1)/2)./R);
+    else    %n_layer is even ==> isothermal layer
+        T=T_0_row(n_layer);
+        p=p_0_row(n_layer).*exp(-g_0.*(h_G_vec-h_G0_row(n_layer))./R./T_0_row(n_layer));
+    end
+end

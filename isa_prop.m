@@ -6,11 +6,11 @@ gamma=1.4;
 
 h_G0_row=[0,11,25,47,53,79,90,105]*1e3;
 N_layers=length(h_G0_row)-1;
-a_0_row=[-.0065,.003,-.0045,.004];
 T_0_row=nan(1,N_layers);
 T_0_row(1)=288.16;
 p_0_row=nan(1,N_layers);
 p_0_row(1)=101330;
+a_0_row=[-.0065,.003,-.0045,.004];
 
 % Fill in T_0_row and p_0_row
 for n_layer=1:N_layers-1
