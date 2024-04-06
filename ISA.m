@@ -5,13 +5,20 @@ close all
 r=6.356766e6;
 gamma=1.4;
 R=287.04;
+N_layer=50;
+
 h_G0_row=[0,11,25,47,53,79,90,105]*1e3;
 N_layers=length(h_G0_row)-1;
+T_0_row=nan(1,N_layers);
+T_0_row(1)=288.16;
+p_0_row=nan(1,N_layers);
+p_0_row(1)=101330;
 
-T_0_row=[288.16,216.66,216.66,282.66,282.66,165.66,165.66];
-p_0_row=[101330,22632,2488.6,120.44,58.321,1.0094,.10444];
-
-N_layer=50;
+% Fill in T_0_row and p_0_row
+for n_layer=1:N_layers-1
+    [T_0_row(n_layer+1),p_0_row(n_layer+1)]=graient_isothermal_T_p(h_G0_row,T_0_row,p_0_row,R,h_G0_row(n_layer+1),n_layer);
+end
+[T_0_row.',p_0_row.'] %#ok<NOPTS> 
 
 h_G_row=nan(1,N_layers*N_layer);
 T_row=nan(1,N_layers*N_layer);
