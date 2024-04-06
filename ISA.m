@@ -8,6 +8,9 @@ R=287.04;
 h_G0_row=[0,11,25,47,53,79,90,105]*1e3;
 N_layers=length(h_G0_row)-1;
 
+T_0_row=[288.16,216.66,216.66,282.66,282.66,165.66,165.66];
+p_0_row=[101330,22632,2488.6,120.44,58.321,1.0094,.10444];
+
 N_layer=50;
 
 h_G_row=nan(1,N_layers*N_layer);
@@ -16,7 +19,7 @@ p_row=nan(1,N_layers*N_layer);
 for n_layer=1:N_layers
     ind_layer_vec=N_layer*(n_layer-1)+(1:N_layer);
     h_G_row(ind_layer_vec)=linspace(h_G0_row(n_layer),h_G0_row(n_layer+1),N_layer);
-    [T_row(ind_layer_vec),p_row(ind_layer_vec)]=graient_isothermal_T_p(h_G0_row,R,h_G_row(ind_layer_vec),n_layer);
+    [T_row(ind_layer_vec),p_row(ind_layer_vec)]=graient_isothermal_T_p(h_G0_row,T_0_row,p_0_row,R,h_G_row(ind_layer_vec),n_layer);
 end
 h_row=r.*h_G_row./(r+h_G_row);
 rho_row=p_row./R./T_row;
@@ -52,11 +55,8 @@ plot(rho_row,h_G_row./1e3)
 xlabel('rho (kg/m^3)')
 ylabel('h_G (km)')
 
-function [T,p]=graient_isothermal_T_p(h_G0_row,R,h_G_vec,n_layer)
+function [T,p]=graient_isothermal_T_p(h_G0_row,T_0_row,p_0_row,R,h_G_vec,n_layer)
     g_0=9.80665;
-    
-    T_0_row=[288.16,216.66,216.66,282.66,282.66,165.66,165.66];
-    p_0_row=[101330,22632,2488.6,120.44,58.321,1.0094,.10444];
     a_0_row=[-.0065,.003,-.0045,.004];
 
     if mod(n_layer,2)~=0  %n_layer is odd ==> gradient layer
